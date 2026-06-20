@@ -1,1 +1,5 @@
-startup --output_base=/tmp
+# Suppress MODULE.bazel.lockfile
+common --lockfile_mode=off
+
+# Suppress the bazel-* directories.
+common --symlink_prefix=/
