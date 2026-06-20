@@ -1,5 +1,8 @@
-load("@rules_verilog//verilog:defs.bzl", "verilog_library")
+load("//build_defs:bsc_library.bzl", "bsc_library")
+load("//build_defs:yosys_library.bzl", "yosys_library")
+# load("@rules_verilog//verilog:defs.bzl", "verilog_library")
 # load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
+
 
 # cc_library(
 #     name = "dpi_c",
@@ -13,10 +16,10 @@ load("@rules_verilog//verilog:defs.bzl", "verilog_library")
 #     deps = [":dpi_c"],
 # )
 
-verilog_library(
-    name = "counter",
-    srcs = ["counter.v"],
-)
+# verilog_library(
+#     name = "counter",
+#     srcs = ["counter.v"],
+# )
 
 # verilog_rtl_library(
 #     name = "unit_test_top",
