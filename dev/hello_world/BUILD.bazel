@@ -1,0 +1,6 @@
+load("//build_defs:bsc_compile.bzl", "bsc_compile")
+
+bsc_compile(
+	name = "hello_world",
+	srcs = ["Top.bs"],
+)
