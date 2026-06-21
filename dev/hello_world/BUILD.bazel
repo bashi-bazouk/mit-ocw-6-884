@@ -1,6 +1,14 @@
 load("//build_defs:bsc_compile.bzl", "bsc_compile")
+load("//build_defs:bsc_link.bzl", "bsc_link")
 
 bsc_compile(
 	name = "hello_world",
 	srcs = ["Top.bs"],
+	elaborations = ["mkTop"]
+)
+
+bsc_link(
+	name = "hello_world_sim",
+	top = "mkTop",
+	deps = [":hello_world"],
 )
