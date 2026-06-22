@@ -1,0 +1,3 @@
+[submodule "dev/mergesort/flute"]
+	path = dev/mergesort/flute
+	url = git@github.com:bluespec/Flute.git
