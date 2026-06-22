@@ -73,11 +73,12 @@ def bsc_sources_rule_implementation(ctx):
         generated[".ba"] += elaboration_files
         generated[".v"] += verilog_files
 
+    bsc_sources_info = BSCSourcesInfo(modules=ctx.attr.modules)
     output_group_info = OutputGroupInfo(**{
         extension: sources[extension].values() + generated[extension]
         for extension in BSC_SOURCES_EXTENSIONS
     })
-    return output_group_info
+    return bsc_sources_info, output_group_info
 
 bsc_sources_rule = rule(
     implementation = bsc_sources_rule_implementation,
