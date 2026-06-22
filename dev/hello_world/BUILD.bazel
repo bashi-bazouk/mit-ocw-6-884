@@ -1,5 +1,14 @@
+load("//build_defs:bsc_sources.bzl", "bsc_sources")
 load("//build_defs:bsc_compile.bzl", "bsc_compile")
 load("//build_defs:bsc_link.bzl", "bsc_link")
+
+bsc_sources(
+	name = "hello_world_bsc",
+	srcs = ["Top.bs"],
+	modules = {
+		"Top.bs": ["mkTop"]
+	}
+)
 
 bsc_compile(
 	name = "hello_world",

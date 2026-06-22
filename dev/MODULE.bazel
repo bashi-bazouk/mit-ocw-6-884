@@ -4,7 +4,7 @@ local_repository = use_repo_rule("@bazel_tools//tools/build_defs/repo:local.bzl"
 
 local_repository(
     name = "local_tool",
-    path = "/usr/local/bin",
+    path = "/opt/homebrew/bin",
     build_file_content = """
 exports_files(["bsc", "yosys"])
 """,
