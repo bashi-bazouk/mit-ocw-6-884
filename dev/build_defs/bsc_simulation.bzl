@@ -8,7 +8,11 @@ BSC_SIMULATION_RULE_ATTRIBUTES = {
         executable = True,
         cfg = "exec",
         allow_files = True,
-        default="@local_tool//:bsc"
+        default="@bsc_local//:bin/bsc"
+    ),
+    "_bsc_runfiles": attr.label(
+        allow_files = True,
+        default="@bsc_local//:bsc_runfiles"
     )
 }
 
@@ -54,6 +58,7 @@ def bsc_simulation_rule_implementation(ctx):
         outputs = outputs,
         arguments = arguments,
         progress_message = "Linking a bsc simulation: " + ctx.attr.name,
+        tools = ctx.files._bsc_runfiles,
         executable = ctx.executable._bsc
     )
 
