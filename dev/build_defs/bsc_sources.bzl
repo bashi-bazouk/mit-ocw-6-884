@@ -1,13 +1,14 @@
 """Declare files relevant to the Bluespec compiler."""
-load("utilities.bzl", "index_by_extension", "any_file_has_short_path", "relpath", "short_dir")
+load("utilities.bzl", "index_by_extension", "any_file_has_short_path", "flatten_index", "output_group_info_to_index", "relpath", "short_dir")
 
-BSC_SOURCES_EXTENSIONS = [".bs", ".bsv", ".bo", ".ba", ".v"]
+BSC_SOURCES_EXTENSIONS = [".bs", ".bsv", ".bsvi", ".bo", ".ba", ".v"]
 
 BSCSourcesInfo = provider(fields=["modules"])
 
 BSC_SOURCES_RULE_ATTRIBUTES = {
     "srcs": attr.label_list(allow_files=BSC_SOURCES_EXTENSIONS),
     "modules": attr.string_list_dict(),
+    "deps": attr.label_list(providers=[BSCSourcesInfo]),
     "compile_flags": attr.string_list(),
     "_bsc": attr.label(
         executable = True,
@@ -22,9 +23,11 @@ BSC_SOURCES_RULE_ATTRIBUTES = {
 }
 
 def bsc_sources_rule_implementation(ctx):
-    sources = index_by_extension(ctx.files.srcs + ctx.files._bsc_runfiles, extensions=BSC_SOURCES_EXTENSIONS)
+    dep_sourcess = [flatten_index(output_group_info_to_index(dep[OutputGroupInfo])) for dep in ctx.attr.deps]
+    sourcess = [ctx.files.srcs, ctx.files._bsc_runfiles] + dep_sourcess
+    sources = index_by_extension([f for fs in sourcess for f in fs], BSC_SOURCES_EXTENSIONS)
 
-    inputs = [f for fs in sources.values() for f in fs]
+    inputs = flatten_index(sources)
 
     paths = list(set([src.dirname for src in inputs]))
 
@@ -33,20 +36,19 @@ def bsc_sources_rule_implementation(ctx):
         object_short_path = source.short_path.rsplit(".", 1)[0] + ".bo"
         if any_file_has_short_path(sources[".bo"], object_short_path):
             continue
-        object_file = ctx.actions.declare_file(object_short_path)
+        object_file = ctx.actions.declare_file(relpath(object_short_path, ctx.label.package))
 
-        module_names = ctx.attr.modules.get(relpath(source.path, ctx.label.package), [])
-        print(module_names)
+        module_names = ctx.attr.modules.get(relpath(source.short_path, ctx.label.package), [])
 
         elaboration_files = [
-            ctx.actions.declare_file(elaboration_file_short_path, sibling=source) 
+            ctx.actions.declare_file(relpath(elaboration_file_short_path, ctx.label.package), sibling=source) 
             for m in module_names
             for elaboration_file_short_path in ["%s/%s.ba" % (short_dir(source), m)]
             if not any_file_has_short_path(sources[".ba"], elaboration_file_short_path)
         ]
 
         verilog_files = [
-            ctx.actions.declare_file(verilog_file_short_path, sibling=source) 
+            ctx.actions.declare_file(relpath(verilog_file_short_path, ctx.label.package), sibling=source) 
             for m in module_names
             for verilog_file_short_path in ["%s/%s.v" % (short_dir(source), m)]
             if not any_file_has_short_path(sources[".v"], verilog_file_short_path)

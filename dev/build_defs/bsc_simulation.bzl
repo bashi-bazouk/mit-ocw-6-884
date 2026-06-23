@@ -1,4 +1,5 @@
 """Link an executable simulation with Bluespec."""
+load(":utilities.bzl", "output_group_info_to_index")
 load(":bsc_sources.bzl", "BSC_SOURCES_EXTENSIONS", "BSCSourcesInfo")
 
 BSC_SIMULATION_RULE_ATTRIBUTES = {
@@ -21,10 +22,7 @@ def bsc_simulation_rule_implementation(ctx):
     executable_so = ctx.actions.declare_file(ctx.attr.name + ".so")
     simdir_path = executable.dirname
 
-    sources = {
-        extension: getattr(ctx.attr.bsc_sources[OutputGroupInfo], extension).to_list()
-        for extension in BSC_SOURCES_EXTENSIONS
-    }
+    sources = output_group_info_to_index(ctx.attr.bsc_sources[OutputGroupInfo])
 
     inputs = [
         f 

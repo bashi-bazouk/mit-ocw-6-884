@@ -1,0 +1,106 @@
+load("//build_defs:bsc_sources.bzl", "bsc_sources")
+load("//build_defs:bsc_simulation.bzl", "bsc_simulation")
+
+COMPILE_FLAGS = [
+    "-D", "RV64",
+    "-D", "ISA_PRIV_M",
+    "-D", "ISA_PRIV_U",
+    "-D", "ISA_I",
+    "-D", "ISA_M",
+    "-D", "ISA_A",
+    "-D", "ISA_C",
+    "-D", "SHIFT_BARREL",
+    "-D", "MULT_SYNTH",
+    "-D", "Near_Mem_Caches",
+    "-D", "FABRIC64",
+    "-D", "WATCH_TOHOST",
+    "-D", "INCLUDE_ACCEL0"
+]
+
+bsc_sources(
+    name = "mergesort_bsc3",
+    srcs = glob([
+            "flute/src_Core/BSV_Additional_Libs/*",
+        ], exclude=[
+            "**/*.mk",
+            "flute/src_Core/BSV_Additional_Libs/CreditCounter.bsv",
+            "flute/src_Core/BSV_Additional_Libs/AXI4_Stream.bsv",
+        ]),
+    compile_flags = COMPILE_FLAGS
+)
+
+bsc_sources(
+    name = "mergesort_axi4_types_bsc",
+    srcs = ["flute/src_Testbench/Fabrics/AXI4/AXI4_Types.bsv"],
+    deps = [":mergesort_bsc3"],
+    compile_flags = COMPILE_FLAGS
+)
+
+bsc_sources(
+    name = "mergesort_fabric_defs_bsc",
+    srcs = ["flute/src_Core/Core/Fabric_Defs.bsv"],
+    deps = [":mergesort_axi4_types_bsc"],
+    compile_flags = COMPILE_FLAGS
+)
+
+bsc_sources(
+    name = "mergesort_utils_bsc",
+    srcs = ["Utils.bs"],
+    compile_flags = COMPILE_FLAGS
+)
+
+bsc_sources(
+    name = "mergesort_creg_classic_bsc",
+    srcs = ["CReg_Classic.bsv"],
+    compile_flags = COMPILE_FLAGS
+)
+
+bsc_sources(
+    name = "mergesort_merge_engine_bsc",
+    srcs = ["Merge_Engine.bs"],
+    deps = [
+        ":mergesort_bsc3", 
+        ":mergesort_utils_bsc", 
+        ":mergesort_creg_classic_bsc",
+        ":mergesort_fabric_defs_bsc",
+    ],
+    modules = {
+        "Merge_Engine.bs": ["mkMerge_Engine"]
+    },
+    compile_flags = COMPILE_FLAGS
+)
+
+bsc_sources(
+    name = "mergesort_axi4_accel_ifc",
+    srcs = [
+        "flute/src_Testbench/SoC/AXI4_Accel_IFC.bsv",
+    ], #glob([
+    #     "flute/src_Testbench/Fabrics/AXI4/*",
+    #     "flute/src_Testbench/SoC/*",
+    # ], exclude=[
+    #     "**/*.mk",
+    #     "flute/src_Testbench/Fabrics/AXI4/AXI4_Types.bsv",
+    #     "flute/src_Testbench/Fabrics/AXI4/AXI4_Clock_Crossers.bsv",
+    # ]),
+    deps = [":mergesort_merge_engine_bsc"],
+    compile_flags = COMPILE_FLAGS
+)
+
+
+bsc_sources(
+    name = "mergesort_bsc",
+    srcs = [
+        "AXI4_Accel.bs",
+        "flute/src_Core/Core/Fabric_Defs.bsv"
+    ],
+    deps = [
+        ":mergesort_axi4_accel_ifc",
+    ],
+    compile_flags = COMPILE_FLAGS
+)
+
+bsc_simulation(
+    name = "mergesort_bsc_sim",
+    bsc_sources = ":mergesort_bsc",
+    module = "mkMerge_Engine"
+)

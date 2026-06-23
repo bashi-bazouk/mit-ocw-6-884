@@ -15,6 +15,19 @@ def index_by_extension(files, extensions=None):
         for extension in extensions
     }
 
+def index_to_output_group_info(index):
+    return OutputGroupInfo(**index)
+
+def output_group_info_to_index(output_group_info):
+    return {
+        attr: getattr(output_group_info, attr).to_list() 
+        for attr in dir(output_group_info) 
+        if attr not in ["_hidden_top_level_INTERNAL_"]
+    }
+
+def flatten_index(index):
+    return [f for fs in index.values() for f in fs]
+
 def any_file_has_short_path(files, short_path):
     return any([file.short_path == short_path for file in files])
 
