@@ -1,0 +1,45 @@
+typedef enum {
+    R0; R1; R2; R3; R4; R5; R6; R7; R8; R9;
+    R10; R11; R12; R13; R14; R15; R16; R17; R18; R19;
+    R20; R21; R22; R23; R24; R25; R26; R27; R28; R29;
+    R30; R31; PR
+} RegisterName
+
+const PR = R0
+
+data Instruction
+    = LW    { base :: Bits (5); dest :: Bits (5); signed_offset :: Int (16) }
+    | SW    { base :: Bits (5); dest :: Bits (5); signed_offset :: Int (16) }
+    | ADDIU { src :: Bits (5); dest :: Bits (5); signed_immediate :: Int (16) }
+    | SLTI  { src :: Bits (5); dest :: Bits (5); signed_immediate :: Int (16) }
+    | SLTIU { src :: Bits (5); dest :: Bits (5); signed_immediate :: Int (16) }
+    | ANDI  { src :: Bits (5); dest :: Bits (5); zero_ext_immediate :: Int (16) }
+    | ORI   { src :: Bits (5); dest :: Bits (5); zero_ext_immediate :: Int (16) }
+    | XORI  { src :: Bits (5); dest :: Bits (5); zero_ext_immediate :: Int (16) }
+    | LUI   { dest :: Bits (5); zero_ext_immediate :: Int (16) }
+    | SLL   { src :: Bits (5); dest :: Bits (5); shamt :: Bits (5) }
+    | SRL   { src :: Bits (5); dest :: Bits (5); shamt :: Bits (5) }
+    | SRA   { src :: Bits (5); dest :: Bits (5); shamt :: Bits (5) }
+    | SLLV  { rshamt :: Bits (5); src :: Bits (5); dest :: Bits (5) }
+    | SRLV  { rshamt :: Bits (5); src :: Bits (5); dest :: Bits (5) }
+    | SRAV  { rshamt :: Bits (5); src :: Bits (5); dest :: Bits (5) }
+    | ADDU  { src1 :: Bits (5); src2 :: Bits (5); dest :: Bits (5) }
+    | SUBU  { src1 :: Bits (5); src2 :: Bits (5); dest :: Bits (5) }
+    | AND   { src1 :: Bits (5); src2 :: Bits (5); dest :: Bits (5) }
+    | OR    { src1 :: Bits (5); src2 :: Bits (5); dest :: Bits (5) }
+    | XOR   { src1 :: Bits (5); src2 :: Bits (5); dest :: Bits (5) }
+    | NOR   { src1 :: Bits (5); src2 :: Bits (5); dest :: Bits (5) }
+    | SLT   { src1 :: Bits (5); src2 :: Bits (5); dest :: Bits (5) }
+    | SLTU  { src1 :: Bits (5); src2 :: Bits (5); dest :: Bits (5) }
+    | JUMP  { target :: Bits(26) }
+    | JAL   { target :: Bits(26) }
+    | JR    { src :: Bits (5) }
+    | JALR  { src :: Bits (5); dest :: Bits (5) }
+    | BEQ   { src1 :: Bits (5); src2 :: Bits (5); signed_offset :: Int (16) }
+    | BNE   { src1 :: Bits (5); src2 :: Bits (5); signed_offset :: Int (16) }
+    | BLEZ  { src :: Bits (5); signed_offset :: Int (16) }
+    | BGTZ  { src :: Bits (5); signed_offset :: Int (16) }
+    | BLTZ  { src :: Bits (5); signed_offset :: Int (16) }
+    | BGEZ  { src :: Bits (5); signed_offset :: Int (16) }
+    | MFC0  { dest :: Bits (5); cop0src :: Bits (5) }
+    | MFC0  { dest :: Bits (5); cop0dest :: Bits (5) }
