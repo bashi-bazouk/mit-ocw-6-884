@@ -1,45 +1,113 @@
-typedef enum {
-    R0; R1; R2; R3; R4; R5; R6; R7; R8; R9;
-    R10; R11; R12; R13; R14; R15; R16; R17; R18; R19;
-    R20; R21; R22; R23; R24; R25; R26; R27; R28; R29;
-    R30; R31; PR
-} RegisterName
 
-const PR = R0
+package Types where {
+
+type Word = Bit 32;
+
+data Register = 
+    R0 | R1 | R2 | R3 | R4 | R5 | R6 | R7 | R8 | R9 
+    | R10 | R11 | R12 | R13 | R14 | R15 | R16 | R17 | R18 | R19 
+    | R20 | R21 | R22 | R23 | R24 | R25 | R26 | R27 | R28 | R29 
+    | R30 | R31 | PC;
 
 data Instruction
-    = LW    { base :: Bits (5); dest :: Bits (5); signed_offset :: Int (16) }
-    | SW    { base :: Bits (5); dest :: Bits (5); signed_offset :: Int (16) }
-    | ADDIU { src :: Bits (5); dest :: Bits (5); signed_immediate :: Int (16) }
-    | SLTI  { src :: Bits (5); dest :: Bits (5); signed_immediate :: Int (16) }
-    | SLTIU { src :: Bits (5); dest :: Bits (5); signed_immediate :: Int (16) }
-    | ANDI  { src :: Bits (5); dest :: Bits (5); zero_ext_immediate :: Int (16) }
-    | ORI   { src :: Bits (5); dest :: Bits (5); zero_ext_immediate :: Int (16) }
-    | XORI  { src :: Bits (5); dest :: Bits (5); zero_ext_immediate :: Int (16) }
-    | LUI   { dest :: Bits (5); zero_ext_immediate :: Int (16) }
-    | SLL   { src :: Bits (5); dest :: Bits (5); shamt :: Bits (5) }
-    | SRL   { src :: Bits (5); dest :: Bits (5); shamt :: Bits (5) }
-    | SRA   { src :: Bits (5); dest :: Bits (5); shamt :: Bits (5) }
-    | SLLV  { rshamt :: Bits (5); src :: Bits (5); dest :: Bits (5) }
-    | SRLV  { rshamt :: Bits (5); src :: Bits (5); dest :: Bits (5) }
-    | SRAV  { rshamt :: Bits (5); src :: Bits (5); dest :: Bits (5) }
-    | ADDU  { src1 :: Bits (5); src2 :: Bits (5); dest :: Bits (5) }
-    | SUBU  { src1 :: Bits (5); src2 :: Bits (5); dest :: Bits (5) }
-    | AND   { src1 :: Bits (5); src2 :: Bits (5); dest :: Bits (5) }
-    | OR    { src1 :: Bits (5); src2 :: Bits (5); dest :: Bits (5) }
-    | XOR   { src1 :: Bits (5); src2 :: Bits (5); dest :: Bits (5) }
-    | NOR   { src1 :: Bits (5); src2 :: Bits (5); dest :: Bits (5) }
-    | SLT   { src1 :: Bits (5); src2 :: Bits (5); dest :: Bits (5) }
-    | SLTU  { src1 :: Bits (5); src2 :: Bits (5); dest :: Bits (5) }
-    | JUMP  { target :: Bits(26) }
-    | JAL   { target :: Bits(26) }
-    | JR    { src :: Bits (5) }
-    | JALR  { src :: Bits (5); dest :: Bits (5) }
-    | BEQ   { src1 :: Bits (5); src2 :: Bits (5); signed_offset :: Int (16) }
-    | BNE   { src1 :: Bits (5); src2 :: Bits (5); signed_offset :: Int (16) }
-    | BLEZ  { src :: Bits (5); signed_offset :: Int (16) }
-    | BGTZ  { src :: Bits (5); signed_offset :: Int (16) }
-    | BLTZ  { src :: Bits (5); signed_offset :: Int (16) }
-    | BGEZ  { src :: Bits (5); signed_offset :: Int (16) }
-    | MFC0  { dest :: Bits (5); cop0src :: Bits (5) }
-    | MFC0  { dest :: Bits (5); cop0dest :: Bits (5) }
+    = LW    { base :: Bit 5; dest :: Bit 5; signed_offset :: Int 16 }
+    | SW    { base :: Bit 5; dest :: Bit 5; signed_offset :: Int 16 }
+    | ADDIU { src :: Bit 5; dest :: Bit 5; signed_immediate :: Int 16 }
+    | SLTI  { src :: Bit 5; dest :: Bit 5; signed_immediate :: Int 16 }
+    | SLTIU { src :: Bit 5; dest :: Bit 5; signed_immediate :: Int 16 }
+    | ANDI  { src :: Bit 5; dest :: Bit 5; zero_ext_immediate :: Int 16 }
+    | ORI   { src :: Bit 5; dest :: Bit 5; zero_ext_immediate :: Int 16 }
+    | XORI  { src :: Bit 5; dest :: Bit 5; zero_ext_immediate :: Int 16 }
+    | LUI   { dest :: Bit 5; zero_ext_immediate :: Int 16 }
+    | SLL   { src :: Bit 5; dest :: Bit 5; shamt :: Bit 5 }
+    | SRL   { src :: Bit 5; dest :: Bit 5; shamt :: Bit 5 }
+    | SRA   { src :: Bit 5; dest :: Bit 5; shamt :: Bit 5 }
+    | SLLV  { rshamt :: Bit 5; src :: Bit 5; dest :: Bit 5 }
+    | SRLV  { rshamt :: Bit 5; src :: Bit 5; dest :: Bit 5 }
+    | SRAV  { rshamt :: Bit 5; src :: Bit 5; dest :: Bit 5 }
+    | ADDU  { src1 :: Bit 5; src2 :: Bit 5; dest :: Bit 5 }
+    | SUBU  { src1 :: Bit 5; src2 :: Bit 5; dest :: Bit 5 }
+    | AND   { src1 :: Bit 5; src2 :: Bit 5; dest :: Bit 5 }
+    | OR    { src1 :: Bit 5; src2 :: Bit 5; dest :: Bit 5 }
+    | XOR   { src1 :: Bit 5; src2 :: Bit 5; dest :: Bit 5 }
+    | NOR   { src1 :: Bit 5; src2 :: Bit 5; dest :: Bit 5 }
+    | SLT   { src1 :: Bit 5; src2 :: Bit 5; dest :: Bit 5 }
+    | SLTU  { src1 :: Bit 5; src2 :: Bit 5; dest :: Bit 5 }
+    | J     { target :: Bit 26 }
+    | JAL   { target :: Bit 26 }
+    | JR    { src :: Bit 5 }
+    | JALR  { src :: Bit 5; dest :: Bit 5 }
+    | BEQ   { src1 :: Bit 5; src2 :: Bit 5; signed_offset :: Int 16 }
+    | BNE   { src1 :: Bit 5; src2 :: Bit 5; signed_offset :: Int 16 }
+    | BLEZ  { src :: Bit 5; signed_offset :: Int 16 }
+    | BGTZ  { src :: Bit 5; signed_offset :: Int 16 }
+    | BLTZ  { src :: Bit 5; signed_offset :: Int 16 }
+    | BGEZ  { src :: Bit 5; signed_offset :: Int 16 }
+    | MFC0  { dest :: Bit 5; cop0src :: Bit 5 }
+    | MTC0  { src :: Bit 5; cop0dest :: Bit 5 };
+
+decode :: Word -> Instruction;
+decode w =
+    let opcode = w[31:26];
+        rs = w[25:21];
+        rt = w[20:16];
+        rd = w[15:11];
+        shamt = w[10:6];
+        funct = w[5:0];
+        immediate = w[15:0];
+        target = w[25:0];
+    in
+    case opcode of {
+        0b100011 -> LW { base = rs; dest = rt; signed_offset = unpack (immediate) };
+        0b101011 -> SW { base = rs; dest = rt; signed_offset = unpack (immediate) };
+        0b001001 -> ADDIU { src = rs; dest = rt; signed_immediate = unpack (immediate) };
+        0b001010 -> SLTI { src = rs; dest = rt; signed_immediate = unpack (immediate) };
+        0b001011 -> SLTIU { src = rs; dest = rt; signed_immediate = unpack (immediate) };
+        0b001100 -> ANDI { src = rs; dest = rt; zero_ext_immediate = unpack (immediate) };
+        0b001101 -> ORI { src = rs; dest = rt; zero_ext_immediate = unpack (immediate) };
+        0b001110 -> XORI { src = rs; dest = rt; zero_ext_immediate = unpack (immediate) };
+        0b001111 -> LUI { dest = rt; zero_ext_immediate = unpack (immediate) };
+        0b000000 ->
+            case funct of {
+                0b000000 -> SLL { src = rt; dest = rd; shamt = shamt };
+                0b000010 -> SRL { src = rt; dest = rd; shamt = shamt };
+                0b000011 -> SRA { src = rt; dest = rd; shamt = shamt };
+                0b000100 -> SLLV { rshamt = rs; src = rt; dest = rd };
+                0b000110 -> SRLV { rshamt = rs; src = rt; dest = rd };
+                0b000111 -> SRAV { rshamt = rs; src = rt; dest = rd };
+                0b100001 -> ADDU { src1 = rs; src2 = rt; dest = rd };
+                0b100011 -> SUBU { src1 = rs; src2 = rt; dest = rd };
+                0b100100 -> AND { src1 = rs; src2 = rt; dest = rd };
+                0b100101 -> OR { src1 = rs; src2 = rt; dest = rd };
+                0b100110 -> XOR { src1 = rs; src2 = rt; dest = rd };
+                0b100111 -> NOR { src1 = rs; src2 = rt; dest = rd };
+                0b101010 -> SLT { src1 = rs; src2 = rt; dest = rd };
+                0b101011 -> SLTU { src1 = rs; src2 = rt; dest = rd };
+                0b001000 -> JR { src = rs };
+                0b001001 -> JALR { src = rs; dest = rd };
+            };
+        0b000010 -> J { target = target };
+        0b000011 -> JAL { target = target };
+        0b000100 -> BEQ { src1 = rs; src2 = rt; signed_offset = unpack (immediate) };
+        0b000101 -> BNE { src1 = rs; src2 = rt; signed_offset = unpack (immediate) };
+        0b000110 -> BLEZ { src = rs; signed_offset = unpack (immediate) };
+        0b000111 -> BGTZ { src = rs; signed_offset = unpack (immediate) };
+        0b000001 ->
+            case rt of {
+                0b00000 -> BLTZ { src = rs; signed_offset = unpack (immediate) };
+                0b00001 -> BGEZ { src = rs; signed_offset = unpack (immediate) };
+            };
+        0b010000 ->
+            case rs of {
+                0b00000 -> MFC0 { dest = rt; cop0src = rd };
+                0b00100 -> MTC0 { src = rt; cop0dest = rd };
+            };
+    };
+
+}
+
+
+
+-- decode 0b100011 ++ base ++ dest ++ signed_offset = LW (base, dest, signed_offset)
+
+-- 

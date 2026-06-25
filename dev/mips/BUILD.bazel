@@ -2,6 +2,6 @@ load("//build_defs:bsc_sources.bzl", "bsc_sources")
 load("//build_defs:bsc_simulation.bzl", "bsc_simulation")
 
 bsc_sources(
-    name = "mips_cpu_interface",
-    srcs = ["mips_cpu.bsv"],
+    name = "types",
+    srcs = ["Types.bs"],
 )
