@@ -2,112 +2,119 @@
 package Types where {
 
 type Word = Bit 32;
+type Half = Bit 16;
+type Byte = Bit 8;
+
+interface MIPS32 = {
+    set_clk :: Bit 1 -> Action;
+    set_reset :: Bit 1 -> Action;
+    set_int_ext :: Bit 1 -> Action;
+    set_from_host :: Byte -> Action;
+    set_read_data :: Word -> Action;
+    set_inst :: Word -> Action;
+
+    get_tohost :: Byte;
+    get_addr :: Byte;
+    get_wen :: Bit 1;
+    get_write_data :: Word;
+    get_iaddr :: Word;
+};
+
+interface FetchStage = {
+    set_program_counter_jump_return :: Bit 32 -> Action;
+    get_program_counter_sequential_step :: Bit 32;
+    get_program_counter_branch :: Bit 32;
+    get_program_counter_jump :: Bit 32;
+    get_instruction :: Bit 32;
+};
+
+interface ExecuteStage = {
+    set_instruction :: Bit 32;
+
+};
 
 data Register = 
     R0 | R1 | R2 | R3 | R4 | R5 | R6 | R7 | R8 | R9 
     | R10 | R11 | R12 | R13 | R14 | R15 | R16 | R17 | R18 | R19 
     | R20 | R21 | R22 | R23 | R24 | R25 | R26 | R27 | R28 | R29 
-    | R30 | R31 | PC;
+    | R30 | R31 | PC | HI | LO;
 
 data Instruction
-    = LW    { base :: Bit 5; dest :: Bit 5; signed_offset :: Int 16 }
-    | SW    { base :: Bit 5; dest :: Bit 5; signed_offset :: Int 16 }
-    | ADDIU { src :: Bit 5; dest :: Bit 5; signed_immediate :: Int 16 }
-    | SLTI  { src :: Bit 5; dest :: Bit 5; signed_immediate :: Int 16 }
-    | SLTIU { src :: Bit 5; dest :: Bit 5; signed_immediate :: Int 16 }
-    | ANDI  { src :: Bit 5; dest :: Bit 5; zero_ext_immediate :: Int 16 }
-    | ORI   { src :: Bit 5; dest :: Bit 5; zero_ext_immediate :: Int 16 }
-    | XORI  { src :: Bit 5; dest :: Bit 5; zero_ext_immediate :: Int 16 }
-    | LUI   { dest :: Bit 5; zero_ext_immediate :: Int 16 }
-    | SLL   { src :: Bit 5; dest :: Bit 5; shamt :: Bit 5 }
-    | SRL   { src :: Bit 5; dest :: Bit 5; shamt :: Bit 5 }
-    | SRA   { src :: Bit 5; dest :: Bit 5; shamt :: Bit 5 }
-    | SLLV  { rshamt :: Bit 5; src :: Bit 5; dest :: Bit 5 }
-    | SRLV  { rshamt :: Bit 5; src :: Bit 5; dest :: Bit 5 }
-    | SRAV  { rshamt :: Bit 5; src :: Bit 5; dest :: Bit 5 }
-    | ADDU  { src1 :: Bit 5; src2 :: Bit 5; dest :: Bit 5 }
-    | SUBU  { src1 :: Bit 5; src2 :: Bit 5; dest :: Bit 5 }
-    | AND   { src1 :: Bit 5; src2 :: Bit 5; dest :: Bit 5 }
-    | OR    { src1 :: Bit 5; src2 :: Bit 5; dest :: Bit 5 }
-    | XOR   { src1 :: Bit 5; src2 :: Bit 5; dest :: Bit 5 }
-    | NOR   { src1 :: Bit 5; src2 :: Bit 5; dest :: Bit 5 }
-    | SLT   { src1 :: Bit 5; src2 :: Bit 5; dest :: Bit 5 }
-    | SLTU  { src1 :: Bit 5; src2 :: Bit 5; dest :: Bit 5 }
-    | J     { target :: Bit 26 }
-    | JAL   { target :: Bit 26 }
-    | JR    { src :: Bit 5 }
-    | JALR  { src :: Bit 5; dest :: Bit 5 }
-    | BEQ   { src1 :: Bit 5; src2 :: Bit 5; signed_offset :: Int 16 }
-    | BNE   { src1 :: Bit 5; src2 :: Bit 5; signed_offset :: Int 16 }
-    | BLEZ  { src :: Bit 5; signed_offset :: Int 16 }
-    | BGTZ  { src :: Bit 5; signed_offset :: Int 16 }
-    | BLTZ  { src :: Bit 5; signed_offset :: Int 16 }
-    | BGEZ  { src :: Bit 5; signed_offset :: Int 16 }
-    | MFC0  { dest :: Bit 5; cop0src :: Bit 5 }
-    | MTC0  { src :: Bit 5; cop0dest :: Bit 5 };
+    -- Load and Store Instructions
+    -- = LB    {} -- Load Byte
+    -- | LH    {} -- Load Half
+    = LW    { base :: Bit 5; dest :: Bit 5; signed_offset :: Int 16 }  -- Load Word
+    | LBU   { base :: Bit 5; dest :: Bit 5; signed_offset :: Int 16 }  -- Load Byte Unsigned 
+    | LHU   { base :: Bit 5; dest :: Bit 5; signed_offset :: Int 16 }  -- Load Half Unsigned
+    | SB    { base :: Bit 5; dest :: Bit 5; signed_offset :: Int 16 }  -- Store Byte
+    | SH    { base :: Bit 5; dest :: Bit 5; signed_offset :: Int 16 }  -- Store Half
+    | SW    { base :: Bit 5; dest :: Bit 5; signed_offset :: Int 16 }  -- Store Word
+    -- Computational Instructions
+    -- | ADDI  {}
+    | ADDIU { src :: Bit 5; dest :: Bit 5; signed_immediate :: Int 16 } -- Add Int Unsigned
+    | SLTI  { src :: Bit 5; dest :: Bit 5; signed_immediate :: Int 16 } -- Set Less Than Immediate
+    | SLTIU { src :: Bit 5; dest :: Bit 5; signed_immediate :: Int 16 } -- Set Less Than Immediate Unsigned
+    | ANDI  { src :: Bit 5; dest :: Bit 5; zero_ext_immediate :: Int 16 } -- AND Immediate
+    | ORI   { src :: Bit 5; dest :: Bit 5; zero_ext_immediate :: Int 16 } -- OR Immediate
+    | XORI  { src :: Bit 5; dest :: Bit 5; zero_ext_immediate :: Int 16 } -- XORI Immediate
+    | LUI   { dest :: Bit 5; zero_ext_immediate :: Int 16 } -- Load Upper Immediate
+    | SLL   { src :: Bit 5; dest :: Bit 5; shamt :: Bit 5 } -- Shift Left Logical
+    | SRL   { src :: Bit 5; dest :: Bit 5; shamt :: Bit 5 } -- Shift Right Logical
+    | SRA   { src :: Bit 5; dest :: Bit 5; shamt :: Bit 5 } -- Shift Right Arithmetic
+    | SLLV  { rshamt :: Bit 5; src :: Bit 5; dest :: Bit 5 } -- Shift Left Logical Value
+    | SRLV  { rshamt :: Bit 5; src :: Bit 5; dest :: Bit 5 } -- Shift Right Logical Value
+    | SRAV  { rshamt :: Bit 5; src :: Bit 5; dest :: Bit 5 } -- Shift Right Arithmetic Value
+    -- | ADD   {} -- Add with Overflow
+    | ADDU  { src1 :: Bit 5; src2 :: Bit 5; dest :: Bit 5 } -- Add without Overflow
+    -- | SUB   {}  -- Subtract with Overflow
+    | SUBU  { src1 :: Bit 5; src2 :: Bit 5; dest :: Bit 5 } -- Subtract without Overflow
+    | AND   { src1 :: Bit 5; src2 :: Bit 5; dest :: Bit 5 } -- Logical AND
+    | OR    { src1 :: Bit 5; src2 :: Bit 5; dest :: Bit 5 } -- Logical OR
+    | XOR   { src1 :: Bit 5; src2 :: Bit 5; dest :: Bit 5 } -- Logical XOR
+    | NOR   { src1 :: Bit 5; src2 :: Bit 5; dest :: Bit 5 } -- Logical NOR
+    | SLT   { src1 :: Bit 5; src2 :: Bit 5; dest :: Bit 5 } -- Set Less Than
+    | SLTU  { src1 :: Bit 5; src2 :: Bit 5; dest :: Bit 5 } -- Set Less Than Unsigned
+    -- | MULT  {} -- Multiply
+    -- | MULTU {} -- Multiply Unsigned
+    -- | DIV   {} -- Divide
+    -- | DIVU  {} -- Divide Unsigned
+    -- | MFHI  {} -- Move From Hi
+    -- | MFLO  {} -- Move From Lo
+    -- | MTHI  {} -- Move To Hi
+    -- | MTLO  {} -- Move To Low
+    -- Jump and Branch Instructions
+    | J     { target :: Bit 26 } -- Jump
+    | JAL   { target :: Bit 26 } -- Jump and Link
+    | JR    { src :: Bit 5 } -- Jump Register
+    | JALR  { src :: Bit 5; dest :: Bit 5 } -- Jump and Link Register
+    | BEQ   { src1 :: Bit 5; src2 :: Bit 5; signed_offset :: Int 16 } -- Branch Equal
+    | BNE   { src1 :: Bit 5; src2 :: Bit 5; signed_offset :: Int 16 } -- Branch Not Equal
+    | BLEZ  { src :: Bit 5; signed_offset :: Int 16 } -- Branch Less Than Equal Zero
+    | BGTZ  { src :: Bit 5; signed_offset :: Int 16 } -- Branch Greater Than Zero
+    | BLTZ  { src :: Bit 5; signed_offset :: Int 16 } -- Branch Less Than Zero
+    | BGEZ  { src :: Bit 5; signed_offset :: Int 16 } -- Branch Greater Than Equal Zero
+    -- | BLTZAL {} -- Branch Less Than Zero Always Link
+    -- | BGEZAL {} -- Branch Greater Equal Zero Always Link
+    -- | BEQL  {} -- Branch Equal Likely
+    -- | BNEL  {} -- Branch Not Equal Likely
+    -- | BLEZL {} -- Branch Less Equal Zero Likely
+    -- | BGTZL {} -- Branch Greater Than Zero Likely
+    -- | BLTZL {} -- Branch Less Than Zero Likely
+    -- | BGEZL {} -- Branch Greater Equal Zero Likely
+    -- | BLTZALL{} -- Branch Less Than Zero Always Link Likely
+    -- | BGEZALL{} -- ranch Greater Equal Zero Always Linke Likely
+    -- System Coprocessor Instructions
+    | MFC0  { dest :: Bit 5; cop0src :: Bit 5 } -- Move From Coprocessor 0
+    | MTC0  { src :: Bit 5; cop0dest :: Bit 5 }; -- Move To Coprocessor 0
+    -- | RFE   {}
+    -- | ICINV {};
 
-decode :: Word -> Instruction;
-decode w =
-    let opcode = w[31:26];
-        rs = w[25:21];
-        rt = w[20:16];
-        rd = w[15:11];
-        shamt = w[10:6];
-        funct = w[5:0];
-        immediate = w[15:0];
-        target = w[25:0];
-    in
-    case opcode of {
-        0b100011 -> LW { base = rs; dest = rt; signed_offset = unpack (immediate) };
-        0b101011 -> SW { base = rs; dest = rt; signed_offset = unpack (immediate) };
-        0b001001 -> ADDIU { src = rs; dest = rt; signed_immediate = unpack (immediate) };
-        0b001010 -> SLTI { src = rs; dest = rt; signed_immediate = unpack (immediate) };
-        0b001011 -> SLTIU { src = rs; dest = rt; signed_immediate = unpack (immediate) };
-        0b001100 -> ANDI { src = rs; dest = rt; zero_ext_immediate = unpack (immediate) };
-        0b001101 -> ORI { src = rs; dest = rt; zero_ext_immediate = unpack (immediate) };
-        0b001110 -> XORI { src = rs; dest = rt; zero_ext_immediate = unpack (immediate) };
-        0b001111 -> LUI { dest = rt; zero_ext_immediate = unpack (immediate) };
-        0b000000 ->
-            case funct of {
-                0b000000 -> SLL { src = rt; dest = rd; shamt = shamt };
-                0b000010 -> SRL { src = rt; dest = rd; shamt = shamt };
-                0b000011 -> SRA { src = rt; dest = rd; shamt = shamt };
-                0b000100 -> SLLV { rshamt = rs; src = rt; dest = rd };
-                0b000110 -> SRLV { rshamt = rs; src = rt; dest = rd };
-                0b000111 -> SRAV { rshamt = rs; src = rt; dest = rd };
-                0b100001 -> ADDU { src1 = rs; src2 = rt; dest = rd };
-                0b100011 -> SUBU { src1 = rs; src2 = rt; dest = rd };
-                0b100100 -> AND { src1 = rs; src2 = rt; dest = rd };
-                0b100101 -> OR { src1 = rs; src2 = rt; dest = rd };
-                0b100110 -> XOR { src1 = rs; src2 = rt; dest = rd };
-                0b100111 -> NOR { src1 = rs; src2 = rt; dest = rd };
-                0b101010 -> SLT { src1 = rs; src2 = rt; dest = rd };
-                0b101011 -> SLTU { src1 = rs; src2 = rt; dest = rd };
-                0b001000 -> JR { src = rs };
-                0b001001 -> JALR { src = rs; dest = rd };
-            };
-        0b000010 -> J { target = target };
-        0b000011 -> JAL { target = target };
-        0b000100 -> BEQ { src1 = rs; src2 = rt; signed_offset = unpack (immediate) };
-        0b000101 -> BNE { src1 = rs; src2 = rt; signed_offset = unpack (immediate) };
-        0b000110 -> BLEZ { src = rs; signed_offset = unpack (immediate) };
-        0b000111 -> BGTZ { src = rs; signed_offset = unpack (immediate) };
-        0b000001 ->
-            case rt of {
-                0b00000 -> BLTZ { src = rs; signed_offset = unpack (immediate) };
-                0b00001 -> BGEZ { src = rs; signed_offset = unpack (immediate) };
-            };
-        0b010000 ->
-            case rs of {
-                0b00000 -> MFC0 { dest = rt; cop0src = rd };
-                0b00100 -> MTC0 { src = rt; cop0dest = rd };
-            };
-    };
+data ProgramCounterTransformations
+    = StepSequential
+    | Branch
+    | Jump
+    | JumpRelative
 
 }
 
 
-
--- decode 0b100011 ++ base ++ dest ++ signed_offset = LW (base, dest, signed_offset)
-
--- 

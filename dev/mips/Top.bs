@@ -1,0 +1,15 @@
+import Types;
+
+import FetchStage;
+import ExecuteStage;
+import SystemCoprocessor0;
+
+
+
+mips_cpu :: Module MIPS32
+mips_cpu = module
+    fetch_stage = mkFetchStage;
+    execute_stage = mkExecuteStage;
+    system_coprocessor_zero = mkSystemCoprocessor0;
+
+    instruction_register = mkReg (Instruction);

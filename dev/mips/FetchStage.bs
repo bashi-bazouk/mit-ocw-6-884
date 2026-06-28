@@ -1,0 +1,34 @@
+package FetchStage where {
+import Types;
+import Vector;
+
+mkFetchStage :: Reg (Instruction) -> Module FetchStage;
+mkFetchStage instruction_register = module {
+    pc_f <- mkReg 0;
+    pc_jr <- mkReg 0;
+
+    -- A 16KB instruction cache can hold 4000 instructions.
+    instruction_memory :: Vector 4000 Word;
+    instruction_memory <- newVector;
+
+    interface {
+        set_pc_jr pc_jr' = action {
+            pc_jr := pc_jr';
+        };
+
+        get_pc_seq = action {
+            return pc_f._read + 4;
+        };
+
+        -- get_next_pc_f = action {
+
+        -- };
+
+        -- get_instruction = action {
+
+        -- };
+    }
+};
+
+}
+

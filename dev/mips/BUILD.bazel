@@ -5,3 +5,9 @@ bsc_sources(
     name = "types",
     srcs = ["Types.bs"],
 )
+
+bsc_sources(
+    name = "stages",
+    srcs = ["FetchStage.bs"],
+    deps = [":types"]
+)

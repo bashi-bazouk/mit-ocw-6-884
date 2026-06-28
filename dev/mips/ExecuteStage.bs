@@ -1,0 +1,73 @@
+load Types;
+
+package ExecuteStage where {
+
+decode :: Word -> Instruction;
+decode w =
+    let opcode = w[31:26];
+        rs = w[25:21];
+        rt = w[20:16];
+        rd = w[15:11];
+        shamt = w[10:6];
+        funct = w[5:0];
+        immediate = w[15:0];
+        target = w[25:0];
+    in
+    case opcode of {
+        0b100011 -> LW { base = rs; dest = rt; signed_offset = unpack (immediate) };
+        0b101011 -> SW { base = rs; dest = rt; signed_offset = unpack (immediate) };
+        0b001001 -> ADDIU { src = rs; dest = rt; signed_immediate = unpack (immediate) };
+        0b001010 -> SLTI { src = rs; dest = rt; signed_immediate = unpack (immediate) };
+        0b001011 -> SLTIU { src = rs; dest = rt; signed_immediate = unpack (immediate) };
+        0b001100 -> ANDI { src = rs; dest = rt; zero_ext_immediate = unpack (immediate) };
+        0b001101 -> ORI { src = rs; dest = rt; zero_ext_immediate = unpack (immediate) };
+        0b001110 -> XORI { src = rs; dest = rt; zero_ext_immediate = unpack (immediate) };
+        0b001111 -> LUI { dest = rt; zero_ext_immediate = unpack (immediate) };
+        0b000000 ->
+            case funct of {
+                0b000000 -> SLL { src = rt; dest = rd; shamt = shamt };
+                0b000010 -> SRL { src = rt; dest = rd; shamt = shamt };
+                0b000011 -> SRA { src = rt; dest = rd; shamt = shamt };
+                0b000100 -> SLLV { rshamt = rs; src = rt; dest = rd };
+                0b000110 -> SRLV { rshamt = rs; src = rt; dest = rd };
+                0b000111 -> SRAV { rshamt = rs; src = rt; dest = rd };
+                0b100001 -> ADDU { src1 = rs; src2 = rt; dest = rd };
+                0b100011 -> SUBU { src1 = rs; src2 = rt; dest = rd };
+                0b100100 -> AND { src1 = rs; src2 = rt; dest = rd };
+                0b100101 -> OR { src1 = rs; src2 = rt; dest = rd };
+                0b100110 -> XOR { src1 = rs; src2 = rt; dest = rd };
+                0b100111 -> NOR { src1 = rs; src2 = rt; dest = rd };
+                0b101010 -> SLT { src1 = rs; src2 = rt; dest = rd };
+                0b101011 -> SLTU { src1 = rs; src2 = rt; dest = rd };
+                0b001000 -> JR { src = rs };
+                0b001001 -> JALR { src = rs; dest = rd };
+            };
+        0b000010 -> J { target = target };
+        0b000011 -> JAL { target = target };
+        0b000100 -> BEQ { src1 = rs; src2 = rt; signed_offset = unpack (immediate) };
+        0b000101 -> BNE { src1 = rs; src2 = rt; signed_offset = unpack (immediate) };
+        0b000110 -> BLEZ { src = rs; signed_offset = unpack (immediate) };
+        0b000111 -> BGTZ { src = rs; signed_offset = unpack (immediate) };
+        0b000001 ->
+            case rt of {
+                0b00000 -> BLTZ { src = rs; signed_offset = unpack (immediate) };
+                0b00001 -> BGEZ { src = rs; signed_offset = unpack (immediate) };
+            };
+        0b010000 ->
+            case rs of {
+                0b00000 -> MFC0 { dest = rt; cop0src = rd };
+                0b00100 -> MTC0 { src = rt; cop0dest = rd };
+            };
+    };
+};
+
+mkExecuteStage :: module ExecuteStage
+mkExecuteStage = module {
+
+}
+
+execute :: Instruction -> Action
+execute instruction =
+    case instruction of {
+        LW { base, dest, signed_offset } -> 
+};
